@@ -25,7 +25,7 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-
+#include "app_main.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -86,7 +86,7 @@ const osMessageQueueAttr_t rcDataQueue_attributes = {
 
 /* USER CODE END FunctionPrototypes */
 
-void StartDefaultTask(void *argument);
+void StartDisplayTask(void *argument);
 void StartInputTask(void *argument);
 void StartCrsfTask(void *argument);
 void StartMonitorTask(void *argument);
@@ -125,7 +125,7 @@ void MX_FREERTOS_Init(void) {
 
   /* Create the thread(s) */
   /* creation of DisplayTask */
-  DisplayTaskHandle = osThreadNew(StartDefaultTask, NULL, &DisplayTask_attributes);
+  DisplayTaskHandle = osThreadNew(StartDisplayTask, NULL, &DisplayTask_attributes);
 
   /* creation of InputTask */
   InputTaskHandle = osThreadNew(StartInputTask, NULL, &InputTask_attributes);
@@ -146,22 +146,23 @@ void MX_FREERTOS_Init(void) {
 
 }
 
-/* USER CODE BEGIN Header_StartDefaultTask */
+/* USER CODE BEGIN Header_StartDisplayTask */
 /**
-  * @brief  Function implementing the defaultTask thread.
+  * @brief  Function implementing the DisplayTask thread.
   * @param  argument: Not used
   * @retval None
   */
-/* USER CODE END Header_StartDefaultTask */
-void StartDefaultTask(void *argument)
+/* USER CODE END Header_StartDisplayTask */
+void StartDisplayTask(void *argument)
 {
-  /* USER CODE BEGIN StartDefaultTask */
+  /* USER CODE BEGIN StartDisplayTask */
   /* Infinite loop */
   for(;;)
   {
+	App_DisplayTask(argument);
     osDelay(1);
   }
-  /* USER CODE END StartDefaultTask */
+  /* USER CODE END StartDisplayTask */
 }
 
 /* USER CODE BEGIN Header_StartInputTask */
@@ -177,6 +178,7 @@ void StartInputTask(void *argument)
   /* Infinite loop */
   for(;;)
   {
+	App_InputTask(argument);
     osDelay(1);
   }
   /* USER CODE END StartInputTask */
@@ -195,6 +197,7 @@ void StartCrsfTask(void *argument)
   /* Infinite loop */
   for(;;)
   {
+	App_CrsfTask(argument);
     osDelay(1);
   }
   /* USER CODE END StartCrsfTask */

@@ -1,0 +1,5 @@
+../Core/Src/freertos.c:101:6:MX_FREERTOS_Init	8	static
+../Core/Src/freertos.c:156:6:StartDisplayTask	16	static
+../Core/Src/freertos.c:175:6:StartInputTask	16	static
+../Core/Src/freertos.c:194:6:StartCrsfTask	16	static
+../Core/Src/freertos.c:213:6:StartMonitorTask	16	static

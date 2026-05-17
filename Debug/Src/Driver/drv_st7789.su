@@ -1,0 +1,4 @@
+../Src/Driver/drv_st7789.c:13:13:ST7789_WriteCmd	16	static
+../Src/Driver/drv_st7789.c:21:13:ST7789_WriteData	16	static
+../Src/Driver/drv_st7789.c:29:6:ST7789_Init	8	static
+../Src/Driver/drv_st7789.c:55:6:ST7789_FillScreen	24	static
