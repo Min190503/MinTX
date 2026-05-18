@@ -1,0 +1,4 @@
+../Src/Service/svc_input.c:13:17:map_linear	16	static
+../Src/Service/svc_input.c:21:17:map_dual_slope	16	static
+../Src/Service/svc_input.c:37:6:Svc_Input_Init	8	static
+../Src/Service/svc_input.c:41:6:Svc_Input_Update	40	static

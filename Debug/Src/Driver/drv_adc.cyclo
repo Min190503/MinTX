@@ -1,0 +1,2 @@
+../Src/Driver/drv_adc.c:9:6:Drv_ADC_Start	1
+../Src/Driver/drv_adc.c:13:10:Drv_ADC_GetRaw	2
