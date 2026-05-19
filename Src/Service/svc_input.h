@@ -16,7 +16,7 @@ typedef struct {
 } JoystickAxis_t;
 
 
-extern JoystickAxis_t g_axes[4];
+extern JoystickAxis_t g_axes[7];
 
 
 void Svc_Input_Init(void);
