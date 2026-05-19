@@ -42,7 +42,8 @@ Src/Driver/drv_st7789.o: ../Src/Driver/drv_st7789.c \
  ../Middlewares/Third_Party/FreeRTOS/Source/include/mpu_wrappers.h \
  ../Middlewares/Third_Party/FreeRTOS/Source/include/task.h \
  ../Middlewares/Third_Party/FreeRTOS/Source/include/list.h \
- ../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2/cmsis_os2.h
+ ../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2/cmsis_os2.h \
+ /home/min/FC_mamab_4_H743_V2/MinTX/Src/Common/font6x8.h
 ../Src/Driver/drv_st7789.h:
 ../Core/Inc/main.h:
 ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal.h:
@@ -88,3 +89,4 @@ Src/Driver/drv_st7789.o: ../Src/Driver/drv_st7789.c \
 ../Middlewares/Third_Party/FreeRTOS/Source/include/task.h:
 ../Middlewares/Third_Party/FreeRTOS/Source/include/list.h:
 ../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2/cmsis_os2.h:
+/home/min/FC_mamab_4_H743_V2/MinTX/Src/Common/font6x8.h:

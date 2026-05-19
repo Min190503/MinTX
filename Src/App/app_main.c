@@ -38,11 +38,12 @@ static void UI_UpdateBargraph(void) {
 }
 
 void App_DisplayTask(void *argument){
+	osDelay(500);
 	ST7789_Init();
-	UI_DrawBackground();
+	UI_Init();
 	for(;;){
-		UI_UpdateBargraph();
-		osDelay(50);
+		UI_Update();
+		osDelay(33);
 	}
 }
 

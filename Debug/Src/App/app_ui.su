@@ -1,0 +1,5 @@
+../Src/App/app_ui.c:9:13:UI_DrawTabBar	56	static
+../Src/App/app_ui.c:28:13:UI_DrawChScreen_Static	64	static
+../Src/App/app_ui.c:91:6:UI_Init	8	static
+../Src/App/app_ui.c:98:6:UI_SwitchTab	16	static
+../Src/App/app_ui.c:107:6:UI_Update	64	static

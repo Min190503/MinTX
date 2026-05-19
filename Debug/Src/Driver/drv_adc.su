@@ -1,2 +1,2 @@
-../Src/Driver/drv_adc.c:9:6:Drv_ADC_Start	8	static
-../Src/Driver/drv_adc.c:13:10:Drv_ADC_GetRaw	16	static
+../Src/Driver/drv_adc.c:9:6:Drv_ADC_Start	0	static
+../Src/Driver/drv_adc.c:13:10:Drv_ADC_GetRaw	0	static

@@ -12,6 +12,7 @@ typedef struct {
 	uint16_t cal_max;
 	uint16_t cal_mid;
 	uint8_t use_center;
+	uint8_t invert;
 } JoystickAxis_t;
 
 
@@ -20,5 +21,5 @@ extern JoystickAxis_t g_axes[4];
 
 void Svc_Input_Init(void);
 void Svc_Input_Update(void);
-
+JoystickAxis_t* Svc_Input_GetAxes(void);
 #endif

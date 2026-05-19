@@ -3,10 +3,10 @@
 
 
 JoystickAxis_t g_axes[4] = {
-    {0, 1500, 200, 3900, 2048, 1}, // Roll
-    {0, 1500, 200, 3900, 2048, 1}, // Pitch
-    {0, 1500, 200, 3900, 2048, 1}, // Yaw
-    {0, 1000, 200, 3900, 2048, 0},  // Throttle
+    {0, 1500, 200, 3900, 2048, 1, 1}, // Roll
+    {0, 1500, 200, 3900, 2048, 1, 1}, // Pitch
+    {0, 1500, 200, 3900, 2048, 1, 0}, // Yaw
+    {0, 1000, 200, 3900, 2048, 0, 0},  // Throttle
 };
 
 
@@ -40,7 +40,10 @@ void Svc_Input_Init(void) {
 
 void Svc_Input_Update(void) {
     for (int i = 0; i < 4; i++) {
-        g_axes[i].raw = Drv_ADC_GetRaw(i);
+        uint16_t new_raw = Drv_ADC_GetRaw(i);
+        g_axes[i].raw = (g_axes[i].raw == 0) ? new_raw : (g_axes[i].raw * 8 + new_raw * 2) / 10;
+
+
         if (g_axes[i].use_center) {
             // Roll, Pitch, Yaw → dual-slope
             g_axes[i].mapped = map_dual_slope(g_axes[i].raw,
@@ -55,5 +58,11 @@ void Svc_Input_Update(void) {
                                           g_axes[i].cal_max,
                                           1000, 2000);
         }
+        if (g_axes[i].invert == 1){
+        	g_axes[i].mapped = 3000 - g_axes[i].mapped;
+        }
     }
+}
+JoystickAxis_t* Svc_Input_GetAxes(void) {
+    return g_axes;
 }
