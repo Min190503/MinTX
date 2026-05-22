@@ -9,6 +9,11 @@ static JoystickAxis_t* axes_data = NULL;
 
 static uint16_t old_bar_w[7] = {0, 0, 0, 0, 0, 0, 0 };
 
+static uint8_t cal_state = 0;
+static uint16_t cal_min_temp[4];
+static uint16_t cal_max_temp[4];
+static uint8_t old_cal_state = 255;
+
 //TOP BAR
 static void UI_DrawStatusBar(void){
 	uint16_t top_bg = 0x10A2;
@@ -118,10 +123,123 @@ static void UI_DrawMainScreen_Static(void) {
 static void UI_UpdateMainScreen_Dynamic(void) {
     // Sẽ thêm 2 vòng tròn tọa độ Gimbal
 }
+
+
+//CAL
 static void UI_DrawCalScreen_Static(void) {
 	ST7789_FillRect(0, 21, 320, 199, ST7789_DARK_BG);
-	ST7789_DrawString(8, 26, "CALIBRATION", ST7789_WHITE, ST7789_DARK_BG, 1);
+
+	//Left
+	ST7789_DrawString(45, 55, "L", ST7789_GRAY, ST7789_DARK_BG, 1);
+	ST7789_DrawRoundRect(20, 70, 60, 60, 4, ST7789_GRAY);
+
+	//Right
+	ST7789_DrawString(115, 55, "R", ST7789_GRAY, ST7789_DARK_BG, 1);
+	ST7789_DrawRoundRect(90, 70, 60, 60, 4, ST7789_GRAY);
+
+	ST7789_DrawString(200, 45, "CALIBRATION", ST7789_ORANGE, ST7789_DARK_BG, 1);
+
+	ST7789_DrawRoundRect(175, 170, 50, 22, 4, ST7789_GRAY);
+	ST7789_DrawString(190, 177, "ESC", ST7789_GRAY, ST7789_DARK_BG, 1);
+
+	ST7789_DrawRoundRect(235, 170, 60, 22, 4, ST7789_YELLOW);
+	ST7789_DrawString(252, 177, "NEXT", ST7789_YELLOW, ST7789_DARK_BG, 1);
+
+	cal_state = 0;
+	old_cal_state = 255;
 }
+
+static void UI_UpdateCalScreen_Dynamic(void) {
+	static uint16_t old_l_x = 0, old_l_y = 0;
+	static uint16_t old_r_x = 0, old_r_y = 0;
+
+
+	uint32_t yaw_raw  = axes_data[2].invert ? (4095 - axes_data[2].raw) : axes_data[2].raw;
+	uint32_t roll_raw = axes_data[0].invert ? (4095 - axes_data[0].raw) : axes_data[0].raw;
+	uint16_t dot_l_x = 21 + yaw_raw * 56 / 4095;
+	uint16_t dot_r_x = 91 + roll_raw * 56 / 4095;
+	uint32_t thr_raw   = axes_data[3].invert ? axes_data[3].raw : (4095 - axes_data[3].raw);
+	uint32_t pitch_raw = axes_data[1].invert ? axes_data[1].raw : (4095 - axes_data[1].raw);
+	uint16_t dot_l_y = 71 + thr_raw * 56 / 4095;
+	uint16_t dot_r_y = 71 + pitch_raw * 56 / 4095;
+	if(dot_l_x < 25) dot_l_x = 25; if(dot_l_x > 74) dot_l_x = 74;
+	if(dot_l_y < 75) dot_l_y = 75; if(dot_l_y > 124) dot_l_y = 124;
+	if(dot_r_x < 95) dot_r_x = 95; if(dot_r_x > 144) dot_r_x = 144;
+	if(dot_r_y < 75) dot_r_y = 75; if(dot_r_y > 124) dot_r_y = 124;
+
+
+	if (dot_l_x != old_l_x || dot_l_y != old_l_y || old_l_x == 0) {
+		if (old_l_x != 0) ST7789_FillCircle(old_l_x, old_l_y, 4, ST7789_DARK_BG);
+
+
+		ST7789_DrawLine(21, 100, 78, 100, 0x2945);
+		ST7789_DrawLine(50, 71, 50, 128, 0x2945);
+
+		ST7789_FillCircle(dot_l_x, dot_l_y, 4, ST7789_YELLOW);
+		old_l_x = dot_l_x; old_l_y = dot_l_y;
+	}
+	if (dot_r_x != old_r_x || dot_r_y != old_r_y || old_r_x == 0) {
+		if (old_r_x != 0) ST7789_FillCircle(old_r_x, old_r_y, 4, ST7789_DARK_BG);
+
+		ST7789_DrawLine(91, 100, 148, 100, 0x2945);
+		ST7789_DrawLine(120, 71, 120, 128, 0x2945);
+
+		ST7789_FillCircle(dot_r_x, dot_r_y, 4, ST7789_YELLOW);
+		old_r_x = dot_r_x; old_r_y = dot_r_y;
+	}
+
+	char bufL[16], bufR[16];
+	sprintf(bufL, "L:%d,%d  ", axes_data[2].raw, axes_data[3].raw);
+	sprintf(bufR, "R:%d,%d  ", axes_data[0].raw, axes_data[1].raw);
+	ST7789_DrawString(10, 140, bufL, ST7789_GRAY, ST7789_DARK_BG, 1);
+	ST7789_DrawString(90, 140, bufR, ST7789_GRAY, ST7789_DARK_BG, 1);
+
+
+
+	if (cal_state != old_cal_state) {
+		ST7789_FillRect(180, 65, 130, 80, ST7789_DARK_BG);
+
+		for(int i=0; i<5; i++) {
+			uint16_t color = 0x2945;
+
+			if (cal_state == 3) {
+				color = ST7789_GREEN;
+			}
+			else if (i == cal_state) {
+				color = ST7789_YELLOW;
+			}
+
+			ST7789_FillRect(185 + i*22, 65, 18, 4, color);
+		}
+
+		if (cal_state == 0) {
+			ST7789_DrawString(200, 110, "CALIBRATION", ST7789_YELLOW, ST7789_DARK_BG, 1);
+			ST7789_DrawString(210, 130, "Press NEXT", ST7789_GRAY, ST7789_DARK_BG, 1);
+		} else if (cal_state == 1) {
+			ST7789_DrawString(200, 110, "CENTER STICKS", ST7789_CYAN, ST7789_DARK_BG, 1);
+			ST7789_DrawString(210, 130, "Press NEXT", ST7789_GRAY, ST7789_DARK_BG, 1);
+		} else if (cal_state == 2) {
+			ST7789_DrawString(195, 110, "MOVE MAX/MIN", ST7789_ORANGE, ST7789_DARK_BG, 1);
+			ST7789_DrawString(210, 130, "All Corners", ST7789_GRAY, ST7789_DARK_BG, 1);
+		} else if (cal_state == 3) {
+			ST7789_DrawString(215, 110, "ALL DONE!", ST7789_GREEN, ST7789_DARK_BG, 1);
+			ST7789_DrawString(210, 130, "Press NEXT", ST7789_GRAY, ST7789_DARK_BG, 1);
+		}
+
+		old_cal_state = cal_state;
+	}
+
+
+	if (cal_state == 2) {
+		for(int i=0; i<4; i++){
+			if(axes_data[i].raw < cal_min_temp[i]) cal_min_temp[i] = axes_data[i].raw;
+			if(axes_data[i].raw > cal_max_temp[i]) cal_max_temp[i] = axes_data[i].raw;
+		}
+	}
+}
+
+
+//ST
 static void UI_DrawStScreen_Static(void) {
 	ST7789_FillRect(0, 21, 320, 199, ST7789_DARK_BG);
 	ST7789_DrawString(8, 26, "SETTINGS", ST7789_WHITE, ST7789_DARK_BG, 1);
@@ -167,11 +285,37 @@ void UI_Update(void) {
 	}
 
 	if (Drv_Encoder_GetButton(ENCODER_1)) {
+		if(current_tab == TAB_CAL){
+			if(cal_state == 0){
+				cal_state = 1;
+			}
+			else if(cal_state == 1){
+				axes_data[0].cal_mid = axes_data[0].raw;
+				axes_data[1].cal_mid = axes_data[1].raw;
+				axes_data[2].cal_mid = axes_data[2].raw;
 
+				for(int i = 0; i<4; i++){
+					cal_min_temp[i] = axes_data[i].raw;
+					cal_max_temp[i] = axes_data[i].raw;
+				}
+				cal_state = 2;
+			}
+			else if(cal_state == 2){
+				for(int i=0; i<4; i++){
+					axes_data[i].cal_min = cal_min_temp[i] + 30;
+					axes_data[i].cal_max = cal_max_temp[i] - 30;
+				}
+				cal_state = 3;
+			}
+			else if(cal_state == 3){
+				cal_state = 0;
+			}
+		}
 	}
 
 
     // Gọi hàm Dynamic liên tục để quét data
     if (current_tab == TAB_MAIN)      UI_UpdateMainScreen_Dynamic();
     else if (current_tab == TAB_CH)   UI_UpdateChScreen_Dynamic();
+    else if (current_tab == TAB_CAL)  UI_UpdateCalScreen_Dynamic();
 }
