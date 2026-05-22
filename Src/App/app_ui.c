@@ -197,45 +197,60 @@ static void UI_UpdateCalScreen_Dynamic(void) {
 
 
 	if (cal_state != old_cal_state) {
-		ST7789_FillRect(180, 65, 130, 80, ST7789_DARK_BG);
+		ST7789_FillRect(180, 65, 130, 90, ST7789_DARK_BG);
 
-		for(int i=0; i<5; i++) {
+
+		for(int i=0; i<6; i++) {
 			uint16_t color = 0x2945;
+			if (i < cal_state) color = ST7789_GREEN;
+			else if (i == cal_state) color = ST7789_YELLOW;
 
-			if (cal_state == 3) {
-				color = ST7789_GREEN;
-			}
-			else if (i == cal_state) {
-				color = ST7789_YELLOW;
-			}
-
-			ST7789_FillRect(185 + i*22, 65, 18, 4, color);
+			ST7789_FillRect(185 + i*19, 65, 15, 4, color);
 		}
 
+		// Vẽ Mũi tên và Chữ hướng dẫn tương ứng
 		if (cal_state == 0) {
-			ST7789_DrawString(200, 110, "CALIBRATION", ST7789_YELLOW, ST7789_DARK_BG, 1);
-			ST7789_DrawString(210, 130, "Press NEXT", ST7789_GRAY, ST7789_DARK_BG, 1);
+			ST7789_DrawLine(240, 95, 240, 110, ST7789_WHITE); // Mũi tên XUỐNG
+			ST7789_DrawLine(240, 110, 235, 105, ST7789_WHITE);
+			ST7789_DrawLine(240, 110, 245, 105, ST7789_WHITE);
+			ST7789_DrawString(205, 125, "MAX DOWN", ST7789_YELLOW, ST7789_DARK_BG, 1);
+			ST7789_DrawString(205, 145, "Sticks DOWN", ST7789_GRAY, ST7789_DARK_BG, 1);
 		} else if (cal_state == 1) {
-			ST7789_DrawString(200, 110, "CENTER STICKS", ST7789_CYAN, ST7789_DARK_BG, 1);
-			ST7789_DrawString(210, 130, "Press NEXT", ST7789_GRAY, ST7789_DARK_BG, 1);
+			ST7789_DrawLine(240, 95, 240, 110, ST7789_WHITE); // Mũi tên LÊN
+			ST7789_DrawLine(240, 95, 235, 100, ST7789_WHITE);
+			ST7789_DrawLine(240, 95, 245, 100, ST7789_WHITE);
+			ST7789_DrawString(215, 125, "MAX UP", ST7789_YELLOW, ST7789_DARK_BG, 1);
+			ST7789_DrawString(215, 145, "Sticks UP", ST7789_GRAY, ST7789_DARK_BG, 1);
 		} else if (cal_state == 2) {
-			ST7789_DrawString(195, 110, "MOVE MAX/MIN", ST7789_ORANGE, ST7789_DARK_BG, 1);
-			ST7789_DrawString(210, 130, "All Corners", ST7789_GRAY, ST7789_DARK_BG, 1);
+			ST7789_DrawLine(230, 102, 250, 102, ST7789_WHITE); // Mũi tên TRÁI
+			ST7789_DrawLine(230, 102, 235, 97, ST7789_WHITE);
+			ST7789_DrawLine(230, 102, 235, 107, ST7789_WHITE);
+			ST7789_DrawString(205, 125, "MAX LEFT", ST7789_YELLOW, ST7789_DARK_BG, 1);
+			ST7789_DrawString(205, 145, "Sticks LEFT", ST7789_GRAY, ST7789_DARK_BG, 1);
 		} else if (cal_state == 3) {
-			ST7789_DrawString(215, 110, "ALL DONE!", ST7789_GREEN, ST7789_DARK_BG, 1);
-			ST7789_DrawString(210, 130, "Press NEXT", ST7789_GRAY, ST7789_DARK_BG, 1);
+			ST7789_DrawLine(230, 102, 250, 102, ST7789_WHITE); // Mũi tên PHẢI
+			ST7789_DrawLine(250, 102, 245, 97, ST7789_WHITE);
+			ST7789_DrawLine(250, 102, 245, 107, ST7789_WHITE);
+			ST7789_DrawString(200, 125, "MAX RIGHT", ST7789_YELLOW, ST7789_DARK_BG, 1);
+			ST7789_DrawString(200, 145, "Sticks RIGHT", ST7789_GRAY, ST7789_DARK_BG, 1);
+		} else if (cal_state == 4) {
+			ST7789_FillCircle(240, 102, 4, ST7789_WHITE); // Biểu tượng chấm tròn CENTER
+			ST7789_DrawString(195, 125, "CENTER STICKS", ST7789_YELLOW, ST7789_DARK_BG, 1);
+			ST7789_DrawString(200, 145, "Leave in MID", ST7789_GRAY, ST7789_DARK_BG, 1);
+		} else if (cal_state == 5) {
+			ST7789_DrawString(215, 125, "ALL DONE!", ST7789_GREEN, ST7789_DARK_BG, 1);
+			ST7789_DrawString(210, 145, "Press to EXIT", ST7789_GRAY, ST7789_DARK_BG, 1);
 		}
-
 		old_cal_state = cal_state;
 	}
 
-
-	if (cal_state == 2) {
+	if (cal_state >= 0 && cal_state <= 3) {
 		for(int i=0; i<4; i++){
 			if(axes_data[i].raw < cal_min_temp[i]) cal_min_temp[i] = axes_data[i].raw;
 			if(axes_data[i].raw > cal_max_temp[i]) cal_max_temp[i] = axes_data[i].raw;
 		}
 	}
+
 }
 
 
@@ -286,31 +301,37 @@ void UI_Update(void) {
 
 	if (Drv_Encoder_GetButton(ENCODER_1)) {
 		if(current_tab == TAB_CAL){
-			if(cal_state == 0){
-				cal_state = 1;
-			}
-			else if(cal_state == 1){
-				axes_data[0].cal_mid = axes_data[0].raw;
-				axes_data[1].cal_mid = axes_data[1].raw;
-				axes_data[2].cal_mid = axes_data[2].raw;
+			if (cal_state == 0) {
 
-				for(int i = 0; i<4; i++){
+				for(int i=0; i<4; i++){
 					cal_min_temp[i] = axes_data[i].raw;
 					cal_max_temp[i] = axes_data[i].raw;
 				}
-				cal_state = 2;
+				cal_state = 1;
 			}
-			else if(cal_state == 2){
+			else if (cal_state == 1) { cal_state = 2; }
+			else if (cal_state == 2) { cal_state = 3; }
+			else if (cal_state == 3) {
+
 				for(int i=0; i<4; i++){
 					axes_data[i].cal_min = cal_min_temp[i] + 30;
 					axes_data[i].cal_max = cal_max_temp[i] - 30;
 				}
-				cal_state = 3;
+				cal_state = 4;
 			}
-			else if(cal_state == 3){
+			else if (cal_state == 4) {
+
+				axes_data[0].cal_mid = axes_data[0].raw;
+				axes_data[1].cal_mid = axes_data[1].raw;
+				axes_data[2].cal_mid = axes_data[2].raw;
+				cal_state = 5;
+			}
+			else if (cal_state == 5) {
 				cal_state = 0;
+				UI_SwitchTab(TAB_MAIN);
 			}
 		}
+
 	}
 
 
