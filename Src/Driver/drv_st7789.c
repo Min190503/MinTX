@@ -94,24 +94,38 @@ void ST7789_FillScreen(uint16_t color){
 static uint16_t dma_color_buf[6000];
 
 void ST7789_FillRect(uint16_t x, uint16_t y, uint16_t w, uint16_t h, uint16_t color){
-	if(w == 0 || h == 0) return;
+    if(w == 0 || h == 0) return;
 
-	uint32_t total_pixels = w * h;
-	if(total_pixels > 6000) return;
+    uint32_t total_pixels = w * h;
 
+    while(spi_dma_busy == 1) { osDelay(1); }
 
-    while(spi_dma_busy == 1){
-        osDelay(1);
+    uint16_t swapped_color = (color >> 8) | (color << 8);
+    uint32_t fill_size = (total_pixels > 6000) ? 6000 : total_pixels;
+    for(uint32_t i = 0; i < fill_size; i++){
+        dma_color_buf[i] = swapped_color;
     }
 
-	uint16_t swapped_color = (color >> 8) | (color << 8);
+    ST7789_SetWindow(x, y, x + w - 1, y + h - 1);
+    ST7789_DC_DATA();
+    ST7789_CS_LOW();
 
-	for(uint32_t i = 0; i < total_pixels; i++){
-		dma_color_buf[i] = swapped_color;
-	}
+    uint32_t remaining = total_pixels;
+    while (remaining > 0) {
+        uint32_t send_size = (remaining > 6000) ? 6000 : remaining;
 
-	ST7789_DrawBitmap(x, y, w, h, dma_color_buf);
+        spi_dma_busy = 1;
+        ST7789_CS_LOW();
+        HAL_SPI_Transmit_DMA(&hspi1, (uint8_t*)dma_color_buf, send_size * 2);
+
+        while(spi_dma_busy == 1) { osDelay(1); }
+
+        remaining -= send_size;
+    }
+
+    ST7789_CS_HIGH();
 }
+
 
 void ST7789_DrawRect(uint16_t x, uint16_t y, uint16_t w, uint16_t h, uint16_t color){
 	ST7789_FillRect(x, 			y, 			w, 1, color);

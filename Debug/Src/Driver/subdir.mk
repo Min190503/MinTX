@@ -6,14 +6,17 @@
 # Add inputs and outputs from these tool invocations to the build variables 
 C_SRCS += \
 ../Src/Driver/drv_adc.c \
+../Src/Driver/drv_encoder.c \
 ../Src/Driver/drv_st7789.c 
 
 C_DEPS += \
 ./Src/Driver/drv_adc.d \
+./Src/Driver/drv_encoder.d \
 ./Src/Driver/drv_st7789.d 
 
 OBJS += \
 ./Src/Driver/drv_adc.o \
+./Src/Driver/drv_encoder.o \
 ./Src/Driver/drv_st7789.o 
 
 
@@ -24,7 +27,7 @@ Src/Driver/%.o Src/Driver/%.su Src/Driver/%.cyclo: ../Src/Driver/%.c Src/Driver/
 clean: clean-Src-2f-Driver
 
 clean-Src-2f-Driver:
-	-$(RM) ./Src/Driver/drv_adc.cyclo ./Src/Driver/drv_adc.d ./Src/Driver/drv_adc.o ./Src/Driver/drv_adc.su ./Src/Driver/drv_st7789.cyclo ./Src/Driver/drv_st7789.d ./Src/Driver/drv_st7789.o ./Src/Driver/drv_st7789.su
+	-$(RM) ./Src/Driver/drv_adc.cyclo ./Src/Driver/drv_adc.d ./Src/Driver/drv_adc.o ./Src/Driver/drv_adc.su ./Src/Driver/drv_encoder.cyclo ./Src/Driver/drv_encoder.d ./Src/Driver/drv_encoder.o ./Src/Driver/drv_encoder.su ./Src/Driver/drv_st7789.cyclo ./Src/Driver/drv_st7789.d ./Src/Driver/drv_st7789.o ./Src/Driver/drv_st7789.su
 
 .PHONY: clean-Src-2f-Driver
 

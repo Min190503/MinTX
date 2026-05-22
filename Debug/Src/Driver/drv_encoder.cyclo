@@ -1,0 +1,4 @@
+../Src/Driver/drv_encoder.c:30:6:Drv_Encoder_Init	1
+../Src/Driver/drv_encoder.c:39:6:Drv_Encoder_Update	6
+../Src/Driver/drv_encoder.c:65:14:Drv_Encoder_GetDir	4
+../Src/Driver/drv_encoder.c:77:9:Drv_Encoder_GetButton	3

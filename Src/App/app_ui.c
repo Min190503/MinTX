@@ -2,6 +2,7 @@
 #include "drv_st7789.h"
 #include "svc_input.h"
 #include <stdio.h>
+#include "drv_encoder.h"
 
 static UITab_t  current_tab = TAB_MAIN;
 static JoystickAxis_t* axes_data = NULL;
@@ -117,6 +118,14 @@ static void UI_DrawMainScreen_Static(void) {
 static void UI_UpdateMainScreen_Dynamic(void) {
     // Sẽ thêm 2 vòng tròn tọa độ Gimbal
 }
+static void UI_DrawCalScreen_Static(void) {
+	ST7789_FillRect(0, 21, 320, 199, ST7789_DARK_BG);
+	ST7789_DrawString(8, 26, "CALIBRATION", ST7789_WHITE, ST7789_DARK_BG, 1);
+}
+static void UI_DrawStScreen_Static(void) {
+	ST7789_FillRect(0, 21, 320, 199, ST7789_DARK_BG);
+	ST7789_DrawString(8, 26, "SETTINGS", ST7789_WHITE, ST7789_DARK_BG, 1);
+}
 
 
 // ==============================================================
@@ -135,13 +144,33 @@ void UI_SwitchTab(UITab_t tab) {
     // Tùy theo Tab nào mà gọi hàm Static của Tab đó (Chỉ 1 lần)
     if (tab == TAB_MAIN)      UI_DrawMainScreen_Static();
     else if (tab == TAB_CH)   UI_DrawChScreen_Static();
-
+    else if (tab == TAB_CAL)  UI_DrawCalScreen_Static();
+    else if (tab == TAB_ST)   UI_DrawStScreen_Static();
 
     UI_DrawStatusBar();
     UI_DrawTabBar();
 }
 
 void UI_Update(void) {
+
+	//Encoder 1
+	EncoderDir_t dir = Drv_Encoder_GetDir(ENCODER_1);
+	if(dir == ENC_DIR_CW){
+		if(current_tab < TAB_ST){
+			UI_SwitchTab((UITab_t)(current_tab + 1));
+		}
+	}
+	else if(dir == ENC_DIR_CCW){
+		if(current_tab > TAB_MAIN){
+			UI_SwitchTab((UITab_t)(current_tab - 1));
+		}
+	}
+
+	if (Drv_Encoder_GetButton(ENCODER_1)) {
+
+	}
+
+
     // Gọi hàm Dynamic liên tục để quét data
     if (current_tab == TAB_MAIN)      UI_UpdateMainScreen_Dynamic();
     else if (current_tab == TAB_CH)   UI_UpdateChScreen_Dynamic();

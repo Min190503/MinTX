@@ -1,6 +1,6 @@
-../Src/App/app_ui.c:39:13:UI_DrawTabBar	4
-../Src/App/app_ui.c:57:13:UI_DrawChScreen_Static	2
-../Src/App/app_ui.c:12:13:UI_DrawStatusBar	1
-../Src/App/app_ui.c:126:6:UI_Init	1
-../Src/App/app_ui.c:133:6:UI_SwitchTab	3
-../Src/App/app_ui.c:144:6:UI_Update	5
+../Src/App/app_ui.c:40:13:UI_DrawTabBar	4
+../Src/App/app_ui.c:58:13:UI_DrawChScreen_Static	2
+../Src/App/app_ui.c:13:13:UI_DrawStatusBar	1
+../Src/App/app_ui.c:135:6:UI_Init	1
+../Src/App/app_ui.c:142:6:UI_SwitchTab	5
+../Src/App/app_ui.c:154:6:UI_Update	9

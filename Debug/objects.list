@@ -46,5 +46,6 @@
 "./Src/App/app_main.o"
 "./Src/App/app_ui.o"
 "./Src/Driver/drv_adc.o"
+"./Src/Driver/drv_encoder.o"
 "./Src/Driver/drv_st7789.o"
 "./Src/Service/svc_input.o"
