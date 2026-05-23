@@ -49,4 +49,5 @@
 "./Src/Driver/drv_encoder.o"
 "./Src/Driver/drv_st7789.o"
 "./Src/Service/svc_input.o"
+"./Src/Service/svc_rf.o"
 "./Src/Service/svc_storage.o"

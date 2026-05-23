@@ -29,7 +29,7 @@ static uint16_t map_dual_slope(uint16_t val,
     if(val >= in_max) return out_max;
 
     // Khoảng chết +- 15 đơn vị chống rung lò xo
-    if(val >= (in_mid - 15) && val <= (in_mid + 15)) return out_mid;
+    if(val >= (in_mid - 20) && val <= (in_mid + 20)) return out_mid;
 
     if(val < in_mid){
         return (uint16_t)((uint32_t)(val - in_min) * (out_mid - out_min) / (in_mid - in_min) + out_min);
