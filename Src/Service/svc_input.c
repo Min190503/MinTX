@@ -66,6 +66,25 @@ void Svc_Input_Update(void) {
         	g_axes[i].mapped = 3000 - g_axes[i].mapped;
         }
     }
+
+    //Cong tac 1
+    if(HAL_GPIO_ReadPin(GPIOB, GPIO_PIN_14) == GPIO_PIN_RESET){
+    	g_axes[4].mapped = 2000;
+    } else {
+    	g_axes[4].mapped = 1000;
+    }
+    //cong tac 2
+    if(HAL_GPIO_ReadPin(GPIOB, GPIO_PIN_13) == GPIO_PIN_RESET){
+    	g_axes[5].mapped = 2000;
+    } else {
+    	g_axes[5].mapped = 1000;
+    }
+    //cong tac 3
+	if(HAL_GPIO_ReadPin(GPIOB, GPIO_PIN_12) == GPIO_PIN_RESET){
+		g_axes[6].mapped = 2000;
+	} else {
+		g_axes[6].mapped = 1000;
+	}
 }
 JoystickAxis_t* Svc_Input_GetAxes(void) {
     return g_axes;

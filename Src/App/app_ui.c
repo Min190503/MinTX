@@ -13,6 +13,11 @@ static uint8_t cal_state = 0;
 static uint16_t cal_min_temp[4];
 static uint16_t cal_max_temp[4];
 static uint8_t old_cal_state = 255;
+static uint8_t old_is_armed = 255;
+static uint8_t old_is_angle = 255;
+static int16_t old_t = -999, old_y = -999, old_p = -999, old_r = -999;
+static uint16_t old_main_l_x = 0, old_main_l_y = 0;
+static uint16_t old_main_r_x = 0, old_main_r_y = 0;
 
 //TOP BAR
 static void UI_DrawStatusBar(void){
@@ -58,8 +63,8 @@ static void UI_DrawTabBar(void){
 }
 
 
-// MÀN HÌNH CH (Channels)
-// 1. HÀM TĨNH: Chạy 1 lần khi mở Tab
+// MÀN HÌNH CH
+//1 lần khi mở Tab
 static void UI_DrawChScreen_Static(void) {
 
 	ST7789_FillRect(0, 21, 320, 199, ST7789_DARK_BG);
@@ -80,10 +85,18 @@ static void UI_DrawChScreen_Static(void) {
     }
 }
 
-// 2. HÀM ĐỘNG: Chạy liên tục (Vẽ đè cực nhanh)
+//liên tục
 static void UI_UpdateChScreen_Dynamic(void) {
-	const uint16_t ch_colors[] = {ST7789_RED, ST7789_PURPLE, ST7789_BLUE, ST7789_CYAN,
-	                                  ST7789_WHITE, ST7789_WHITE, ST7789_WHITE};
+	const uint16_t ch_colors[] = {
+			ST7789_RED,    // CH1 (Thr)
+			ST7789_PURPLE, // CH2 (Yaw)
+			ST7789_BLUE,   // CH3 (Pitch)
+			ST7789_CYAN,   // CH4 (Roll)
+			ST7789_ORANGE, // CH5 (Công tắc 1 - Arm)
+			ST7789_GRAY,   // CH6 (Công tắc để tạm)
+			ST7789_GREEN   // CH7 (Công tắc 3 - Mode bay)
+		};
+
 	const uint8_t ui_to_axis[] = {3, 2, 1, 0, 4, 5, 6};
 
     for (int i = 0; i < 7; i++) {
@@ -118,11 +131,122 @@ static void UI_UpdateChScreen_Dynamic(void) {
 // ===== MÀN HÌNH MAIN =====
 static void UI_DrawMainScreen_Static(void) {
 	ST7789_FillRect(0, 21, 320, 199, ST7789_DARK_BG);
-	ST7789_DrawString(8, 26, "QUAD-X", ST7789_WHITE, ST7789_DARK_BG, 1);
+
+	ST7789_DrawString(10, 30, "QUAD-X", ST7789_WHITE, ST7789_DARK_BG, 1);
+
+	ST7789_DrawRoundRect(190, 25, 60, 20, 4, 0x4208);
+	ST7789_DrawRoundRect(260, 25, 50, 20, 4, 0x4208);
+
+	ST7789_DrawRoundRect(20, 55, 100, 100, 6, 0x2945);
+	ST7789_DrawLine(20, 105, 120, 105, 0x2945);
+	ST7789_DrawLine(70, 55, 70, 155, 0x2945);
+	ST7789_DrawCircle(70, 105, 40, 0x2945);
+	ST7789_DrawCircle(70, 105, 20, 0x2945);
+
+
+	ST7789_DrawRoundRect(200, 55, 100, 100, 6, 0x2945);
+	ST7789_DrawLine(200, 105, 300, 105, 0x2945);
+	ST7789_DrawLine(250, 55, 250, 155, 0x2945);
+	ST7789_DrawCircle(250, 105, 40, 0x2945);
+	ST7789_DrawCircle(250, 105, 20, 0x2945);
+
+
+	ST7789_FillRoundRect(10, 175, 300, 40, 5, 0x10A2);
+	ST7789_DrawString(30, 180, "THR", ST7789_GRAY, 0x10A2, 1);
+	ST7789_DrawString(110, 180, "YAW", ST7789_GRAY, 0x10A2, 1);
+	ST7789_DrawString(190, 180, "PIT", ST7789_GRAY, 0x10A2, 1);
+	ST7789_DrawString(270, 180, "ROL", ST7789_GRAY, 0x10A2, 1);
+
+	old_is_armed = 255;
+	old_is_angle = 255;
+	old_t = -999; old_y = -999; old_p = -999; old_r = -999;
+	old_main_l_x = 0; old_main_l_y = 0;
+	old_main_r_x = 0; old_main_r_y = 0;
 }
+
 static void UI_UpdateMainScreen_Dynamic(void) {
-    // Sẽ thêm 2 vòng tròn tọa độ Gimbal
+
+
+	uint8_t is_armed = (axes_data[4].mapped > 1500) ? 1 : 0;
+
+	uint8_t is_angle = (axes_data[6].mapped < 1500) ? 1 : 0;
+
+
+	if (is_armed != old_is_armed) {
+		ST7789_FillRect(261, 26, 48, 18, ST7789_DARK_BG);
+		if (is_armed) {
+			ST7789_DrawRoundRect(260, 25, 50, 20, 4, ST7789_RED);
+			ST7789_DrawString(272, 31, "ARM", ST7789_RED, ST7789_DARK_BG, 1);
+		} else {
+			ST7789_DrawRoundRect(260, 25, 50, 20, 4, ST7789_GRAY);
+			ST7789_DrawString(272, 31, "DIS", ST7789_GRAY, ST7789_DARK_BG, 1);
+		}
+		old_is_armed = is_armed;
+	}
+
+	//MODE
+	if (is_angle != old_is_angle) {
+		ST7789_FillRect(191, 26, 58, 18, ST7789_DARK_BG);
+		if (is_angle) {
+			ST7789_DrawString(205, 31, "ANGLE", ST7789_CYAN, ST7789_DARK_BG, 1);
+		} else {
+			ST7789_DrawString(208, 31, "HOLD", ST7789_PURPLE, ST7789_DARK_BG, 1);
+		}
+		old_is_angle = is_angle;
+	}
+
+
+
+	int16_t thr_pct = (axes_data[3].mapped - 1500) / 5;
+	int16_t yaw_pct = (axes_data[2].mapped - 1500) / 5;
+	int16_t pit_pct = (axes_data[1].mapped - 1500) / 5;
+	int16_t rol_pct = (axes_data[0].mapped - 1500) / 5;
+
+
+	if (thr_pct != old_t || yaw_pct != old_y || pit_pct != old_p || rol_pct != old_r) {
+		char bufL[30], bufR[30];
+		sprintf(bufL, "YAW:%4d  THR:%4d", yaw_pct, thr_pct);
+		sprintf(bufR, "ROL:%4d  PIT:%4d", rol_pct, pit_pct);
+		ST7789_DrawString(20, 160, bufL, ST7789_GRAY, ST7789_DARK_BG, 1);
+		ST7789_DrawString(200, 160, bufR, ST7789_GRAY, ST7789_DARK_BG, 1);
+
+		char bufVal[8];
+		sprintf(bufVal, "%4d", thr_pct); ST7789_DrawString(30,  195, bufVal, ST7789_YELLOW, 0x10A2, 1);
+		sprintf(bufVal, "%4d", yaw_pct); ST7789_DrawString(110, 195, bufVal, ST7789_CYAN,   0x10A2, 1);
+		sprintf(bufVal, "%4d", pit_pct); ST7789_DrawString(190, 195, bufVal, ST7789_PURPLE, 0x10A2, 1);
+		sprintf(bufVal, "%4d", rol_pct); ST7789_DrawString(270, 195, bufVal, ST7789_RED,    0x10A2, 1);
+
+		old_t = thr_pct; old_y = yaw_pct; old_p = pit_pct; old_r = rol_pct;
+	}
+
+	//chấm tròn trên Radar
+	uint16_t dot_l_x = 70 + (yaw_pct * 40) / 100;
+	uint16_t dot_l_y = 105 - (thr_pct * 40) / 100;
+
+	uint16_t dot_r_x = 250 + (rol_pct * 40) / 100;
+	uint16_t dot_r_y = 105 - (pit_pct * 40) / 100;
+
+	if (dot_l_x != old_main_l_x || dot_l_y != old_main_l_y || old_main_l_x == 0) {
+		if (old_main_l_x != 0) ST7789_FillCircle(old_main_l_x, old_main_l_y, 4, ST7789_DARK_BG);
+
+		ST7789_FillRect(20, 105, 100, 1, 0x2945); // Kẻ ngang
+		ST7789_FillRect(70, 55, 1, 100, 0x2945);  // Kẻ dọc
+
+		ST7789_FillCircle(dot_l_x, dot_l_y, 4, ST7789_YELLOW);
+		old_main_l_x = dot_l_x; old_main_l_y = dot_l_y;
+	}
+
+	if (dot_r_x != old_main_r_x || dot_r_y != old_main_r_y || old_main_r_x == 0) {
+		if (old_main_r_x != 0) ST7789_FillCircle(old_main_r_x, old_main_r_y, 4, ST7789_DARK_BG);
+
+		ST7789_FillRect(200, 105, 100, 1, 0x2945);
+		ST7789_FillRect(250, 55, 1, 100, 0x2945);
+
+		ST7789_FillCircle(dot_r_x, dot_r_y, 4, ST7789_YELLOW);
+		old_main_r_x = dot_r_x; old_main_r_y = dot_r_y;
+	}
 }
+
 
 
 //CAL
@@ -208,33 +332,33 @@ static void UI_UpdateCalScreen_Dynamic(void) {
 			ST7789_FillRect(185 + i*19, 65, 15, 4, color);
 		}
 
-		// Vẽ Mũi tên và Chữ hướng dẫn tương ứng
+		//Mũi tên, chữ hướng dẫn
 		if (cal_state == 0) {
-			ST7789_DrawLine(240, 95, 240, 110, ST7789_WHITE); // Mũi tên XUỐNG
+			ST7789_DrawLine(240, 95, 240, 110, ST7789_WHITE); //XUỐNG
 			ST7789_DrawLine(240, 110, 235, 105, ST7789_WHITE);
 			ST7789_DrawLine(240, 110, 245, 105, ST7789_WHITE);
 			ST7789_DrawString(205, 125, "MAX DOWN", ST7789_YELLOW, ST7789_DARK_BG, 1);
 			ST7789_DrawString(205, 145, "Sticks DOWN", ST7789_GRAY, ST7789_DARK_BG, 1);
 		} else if (cal_state == 1) {
-			ST7789_DrawLine(240, 95, 240, 110, ST7789_WHITE); // Mũi tên LÊN
+			ST7789_DrawLine(240, 95, 240, 110, ST7789_WHITE); //LÊN
 			ST7789_DrawLine(240, 95, 235, 100, ST7789_WHITE);
 			ST7789_DrawLine(240, 95, 245, 100, ST7789_WHITE);
 			ST7789_DrawString(215, 125, "MAX UP", ST7789_YELLOW, ST7789_DARK_BG, 1);
 			ST7789_DrawString(215, 145, "Sticks UP", ST7789_GRAY, ST7789_DARK_BG, 1);
 		} else if (cal_state == 2) {
-			ST7789_DrawLine(230, 102, 250, 102, ST7789_WHITE); // Mũi tên TRÁI
+			ST7789_DrawLine(230, 102, 250, 102, ST7789_WHITE); //RÁI
 			ST7789_DrawLine(230, 102, 235, 97, ST7789_WHITE);
 			ST7789_DrawLine(230, 102, 235, 107, ST7789_WHITE);
 			ST7789_DrawString(205, 125, "MAX LEFT", ST7789_YELLOW, ST7789_DARK_BG, 1);
 			ST7789_DrawString(205, 145, "Sticks LEFT", ST7789_GRAY, ST7789_DARK_BG, 1);
 		} else if (cal_state == 3) {
-			ST7789_DrawLine(230, 102, 250, 102, ST7789_WHITE); // Mũi tên PHẢI
+			ST7789_DrawLine(230, 102, 250, 102, ST7789_WHITE); //PHẢI
 			ST7789_DrawLine(250, 102, 245, 97, ST7789_WHITE);
 			ST7789_DrawLine(250, 102, 245, 107, ST7789_WHITE);
 			ST7789_DrawString(200, 125, "MAX RIGHT", ST7789_YELLOW, ST7789_DARK_BG, 1);
 			ST7789_DrawString(200, 145, "Sticks RIGHT", ST7789_GRAY, ST7789_DARK_BG, 1);
 		} else if (cal_state == 4) {
-			ST7789_FillCircle(240, 102, 4, ST7789_WHITE); // Biểu tượng chấm tròn CENTER
+			ST7789_FillCircle(240, 102, 4, ST7789_WHITE);
 			ST7789_DrawString(195, 125, "CENTER STICKS", ST7789_YELLOW, ST7789_DARK_BG, 1);
 			ST7789_DrawString(200, 145, "Leave in MID", ST7789_GRAY, ST7789_DARK_BG, 1);
 		} else if (cal_state == 5) {
@@ -261,20 +385,18 @@ static void UI_DrawStScreen_Static(void) {
 }
 
 
-// ==============================================================
-// API CÔNG KHAI
-// ==============================================================
 
+// API
 void UI_Init(void) {
     axes_data = Svc_Input_GetAxes();
 
     ST7789_FillScreen(ST7789_DARK_BG);
-    UI_SwitchTab(TAB_CH); // Bắt đầu từ tab CH
+    UI_SwitchTab(TAB_MAIN); // Bắt đầu từ tab CH
 }
 
 void UI_SwitchTab(UITab_t tab) {
     current_tab = tab;
-    // Tùy theo Tab nào mà gọi hàm Static của Tab đó (Chỉ 1 lần)
+
     if (tab == TAB_MAIN)      UI_DrawMainScreen_Static();
     else if (tab == TAB_CH)   UI_DrawChScreen_Static();
     else if (tab == TAB_CAL)  UI_DrawCalScreen_Static();
