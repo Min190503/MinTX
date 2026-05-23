@@ -19,6 +19,16 @@ static int16_t old_t = -999, old_y = -999, old_p = -999, old_r = -999;
 static uint16_t old_main_l_x = 0, old_main_l_y = 0;
 static uint16_t old_main_r_x = 0, old_main_r_y = 0;
 
+// Các biến trạng thái Menu cho màn ST
+uint8_t sys_protocol = 0; // 0 = CRSF, 1 = IBUS
+static uint8_t old_sys_protocol = 255;
+static uint8_t st_menu_index = 0;       // 0: Đang trỏ vào Protocol
+static uint8_t st_dropdown_open = 0;    // 0: Đóng, 1: Đang sổ xuống
+static uint8_t st_dropdown_index = 0;   // 0: Chọn CRSF, 1: Chọn IBUS
+static uint8_t old_st_menu_index = 255;
+static uint8_t old_st_dropdown_open = 255;
+static uint8_t old_st_dropdown_index = 255;
+
 //TOP BAR
 static void UI_DrawStatusBar(void){
 	uint16_t top_bg = 0x10A2;
@@ -382,7 +392,87 @@ static void UI_UpdateCalScreen_Dynamic(void) {
 static void UI_DrawStScreen_Static(void) {
 	ST7789_FillRect(0, 21, 320, 199, ST7789_DARK_BG);
 	ST7789_DrawString(8, 26, "SETTINGS", ST7789_WHITE, ST7789_DARK_BG, 1);
+
+
+	ST7789_DrawRoundRect(10, 45, 300, 35, 4, 0x4208);
+	ST7789_DrawString(25, 55, "RF Protocol", ST7789_GRAY, ST7789_DARK_BG, 1);
+	ST7789_DrawRoundRect(230, 50, 70, 25, 4, 0x4208);
+
+
+
+
+	ST7789_DrawRoundRect(10, 135, 300, 75, 4, 0x4208);
+
+
+	ST7789_DrawString(25, 145, "Firmware:", ST7789_GRAY, ST7789_DARK_BG, 1);
+	ST7789_DrawString(25, 165, "Model ID:", ST7789_GRAY, ST7789_DARK_BG, 1);
+	ST7789_DrawString(25, 185, "Bind UID:", ST7789_GRAY, ST7789_DARK_BG, 1);
+
+
+	ST7789_DrawString(160, 145, "v1.0.0", ST7789_WHITE, ST7789_DARK_BG, 1);
+	ST7789_DrawString(160, 165, "QUAD-X", ST7789_WHITE, ST7789_DARK_BG, 1);
+	ST7789_DrawString(160, 185, "A3F2B1", ST7789_YELLOW, ST7789_DARK_BG, 1);
+
+
+	old_sys_protocol = 255;
+	old_st_menu_index = 255;
+	old_st_dropdown_open = 255;
+	old_st_dropdown_index = 255;
+	st_dropdown_open = 0;
 }
+
+static void UI_UpdateStScreen_Dynamic(void) {
+
+	if (st_menu_index != old_st_menu_index) {
+		uint16_t border_color = (st_menu_index == 0 && !st_dropdown_open) ? ST7789_YELLOW : 0x4208;
+		ST7789_DrawRoundRect(10, 45, 300, 35, 4, border_color);
+		old_st_menu_index = st_menu_index;
+	}
+
+
+	if (sys_protocol != old_sys_protocol) {
+		ST7789_FillRect(232, 52, 66, 21, ST7789_DARK_BG);
+		if (sys_protocol == 0) {
+			ST7789_DrawString(245, 55, "CRSF", ST7789_YELLOW, ST7789_DARK_BG, 1);
+		} else {
+			ST7789_DrawString(245, 55, "IBUS", ST7789_GREEN, ST7789_DARK_BG, 1);
+		}
+		old_sys_protocol = sys_protocol;
+	}
+
+
+	if (st_dropdown_open != old_st_dropdown_open ||
+	   (st_dropdown_open && st_dropdown_index != old_st_dropdown_index)) {
+
+		if (st_dropdown_open) {
+
+			ST7789_FillRect(230, 78, 70, 50, ST7789_DARK_BG);
+			ST7789_DrawRoundRect(230, 78, 70, 50, 4, ST7789_CYAN);
+
+			//CRSF
+			uint16_t t_crsf = (st_dropdown_index == 0) ? ST7789_YELLOW : ST7789_GRAY;
+			if(st_dropdown_index == 0) ST7789_FillRect(232, 80, 66, 20, 0x4208); // Bôi đen dòng đang trỏ
+			else ST7789_FillRect(232, 80, 66, 20, ST7789_DARK_BG);
+			ST7789_DrawString(245, 85, "CRSF", t_crsf, (st_dropdown_index == 0)? 0x4208 : ST7789_DARK_BG, 1);
+
+			//IBUS
+			uint16_t t_ibus = (st_dropdown_index == 1) ? ST7789_GREEN : ST7789_GRAY;
+			if(st_dropdown_index == 1) ST7789_FillRect(232, 102, 66, 20, 0x4208);
+			else ST7789_FillRect(232, 102, 66, 20, ST7789_DARK_BG);
+			ST7789_DrawString(245, 107, "IBUS", t_ibus, (st_dropdown_index == 1)? 0x4208 : ST7789_DARK_BG, 1);
+
+		} else if (old_st_dropdown_open == 1) {
+
+			ST7789_FillRect(229, 77, 72, 52, ST7789_DARK_BG);
+		}
+
+		old_st_dropdown_open = st_dropdown_open;
+		old_st_dropdown_index = st_dropdown_index;
+		old_st_menu_index = 255;
+	}
+}
+
+
 
 
 
@@ -456,9 +546,44 @@ void UI_Update(void) {
 
 	}
 
+	//encoder 2 o tab st
+	if (current_tab == TAB_ST) {
+		EncoderDir_t dir2 = Drv_Encoder_GetDir(ENCODER_2);
+
+		if (dir2 == ENC_DIR_CW) {
+			if (!st_dropdown_open) {
+
+			} else {
+				if (st_dropdown_index < 1) st_dropdown_index++;
+			}
+		}
+		else if (dir2 == ENC_DIR_CCW) {
+			if (!st_dropdown_open) {
+				// Cuộn menu ngoài lên
+			} else {
+				// Cuộn trong Dropdown
+				if (st_dropdown_index > 0) st_dropdown_index--;
+			}
+		}
+
+		// Xử lý Bấm nút Encoder 2
+		if (Drv_Encoder_GetButton(ENCODER_2)) {
+			if (!st_dropdown_open) {
+				if (st_menu_index == 0) {
+					st_dropdown_open = 1;
+					st_dropdown_index = sys_protocol;
+				}
+			} else {
+				sys_protocol = st_dropdown_index;
+				st_dropdown_open = 0;
+			}
+		}
+	}
+
 
     // Gọi hàm Dynamic liên tục để quét data
     if (current_tab == TAB_MAIN)      UI_UpdateMainScreen_Dynamic();
     else if (current_tab == TAB_CH)   UI_UpdateChScreen_Dynamic();
     else if (current_tab == TAB_CAL)  UI_UpdateCalScreen_Dynamic();
+    else if (current_tab == TAB_ST)   UI_UpdateStScreen_Dynamic();
 }

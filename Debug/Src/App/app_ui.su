@@ -1,6 +1,6 @@
-../Src/App/app_ui.c:50:13:UI_DrawTabBar	56	static
-../Src/App/app_ui.c:132:13:UI_DrawMainScreen_Static	32	static
-../Src/App/app_ui.c:23:13:UI_DrawStatusBar	32	static
-../Src/App/app_ui.c:390:6:UI_Init	8	static
-../Src/App/app_ui.c:397:6:UI_SwitchTab	88	static
-../Src/App/app_ui.c:409:6:UI_Update	144	static
+../Src/App/app_ui.c:60:13:UI_DrawTabBar	56	static
+../Src/App/app_ui.c:142:13:UI_DrawMainScreen_Static	32	static
+../Src/App/app_ui.c:33:13:UI_DrawStatusBar	32	static
+../Src/App/app_ui.c:480:6:UI_Init	8	static
+../Src/App/app_ui.c:487:6:UI_SwitchTab	88	static
+../Src/App/app_ui.c:499:6:UI_Update	144	static
