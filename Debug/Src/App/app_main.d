@@ -45,7 +45,8 @@ Src/App/app_main.o: ../Src/App/app_main.c ../Src/App/app_main.h \
  ../Middlewares/Third_Party/FreeRTOS/Source/include/list.h \
  ../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2/cmsis_os2.h \
  ../Src/App/app_ui.h \
- /home/min/FC_mamab_4_H743_V2/MinTX/Src/Driver/drv_encoder.h
+ /home/min/FC_mamab_4_H743_V2/MinTX/Src/Driver/drv_encoder.h \
+ /home/min/FC_mamab_4_H743_V2/MinTX/Src/Service/svc_storage.h
 ../Src/App/app_main.h:
 /home/min/FC_mamab_4_H743_V2/MinTX/Src/Driver/drv_st7789.h:
 ../Core/Inc/main.h:
@@ -95,3 +96,4 @@ Src/App/app_main.o: ../Src/App/app_main.c ../Src/App/app_main.h \
 ../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2/cmsis_os2.h:
 ../Src/App/app_ui.h:
 /home/min/FC_mamab_4_H743_V2/MinTX/Src/Driver/drv_encoder.h:
+/home/min/FC_mamab_4_H743_V2/MinTX/Src/Service/svc_storage.h:

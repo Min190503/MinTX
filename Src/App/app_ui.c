@@ -3,6 +3,7 @@
 #include "svc_input.h"
 #include <stdio.h>
 #include "drv_encoder.h"
+#include "svc_storage.h"
 
 static UITab_t  current_tab = TAB_MAIN;
 static JoystickAxis_t* axes_data = NULL;
@@ -279,6 +280,10 @@ static void UI_DrawCalScreen_Static(void) {
 	ST7789_DrawRoundRect(235, 170, 60, 22, 4, ST7789_YELLOW);
 	ST7789_DrawString(252, 177, "NEXT", ST7789_YELLOW, ST7789_DARK_BG, 1);
 
+	for(int i = 0; i < 4; i++) {
+	    cal_min_temp[i] = 4095;
+	    cal_max_temp[i] = 0;
+	}
 	cal_state = 0;
 	old_cal_state = 255;
 }
@@ -514,11 +519,6 @@ void UI_Update(void) {
 	if (Drv_Encoder_GetButton(ENCODER_1)) {
 		if(current_tab == TAB_CAL){
 			if (cal_state == 0) {
-
-				for(int i=0; i<4; i++){
-					cal_min_temp[i] = axes_data[i].raw;
-					cal_max_temp[i] = axes_data[i].raw;
-				}
 				cal_state = 1;
 			}
 			else if (cal_state == 1) { cal_state = 2; }
@@ -540,6 +540,7 @@ void UI_Update(void) {
 			}
 			else if (cal_state == 5) {
 				cal_state = 0;
+				Svc_Storage_Save();
 				UI_SwitchTab(TAB_MAIN);
 			}
 		}
@@ -576,6 +577,7 @@ void UI_Update(void) {
 			} else {
 				sys_protocol = st_dropdown_index;
 				st_dropdown_open = 0;
+				Svc_Storage_Save();
 			}
 		}
 	}

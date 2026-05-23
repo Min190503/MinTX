@@ -5,13 +5,16 @@
 
 # Add inputs and outputs from these tool invocations to the build variables 
 C_SRCS += \
-../Src/Service/svc_input.c 
+../Src/Service/svc_input.c \
+../Src/Service/svc_storage.c 
 
 C_DEPS += \
-./Src/Service/svc_input.d 
+./Src/Service/svc_input.d \
+./Src/Service/svc_storage.d 
 
 OBJS += \
-./Src/Service/svc_input.o 
+./Src/Service/svc_input.o \
+./Src/Service/svc_storage.o 
 
 
 # Each subdirectory must supply rules for building sources it contributes
@@ -21,7 +24,7 @@ Src/Service/%.o Src/Service/%.su Src/Service/%.cyclo: ../Src/Service/%.c Src/Ser
 clean: clean-Src-2f-Service
 
 clean-Src-2f-Service:
-	-$(RM) ./Src/Service/svc_input.cyclo ./Src/Service/svc_input.d ./Src/Service/svc_input.o ./Src/Service/svc_input.su
+	-$(RM) ./Src/Service/svc_input.cyclo ./Src/Service/svc_input.d ./Src/Service/svc_input.o ./Src/Service/svc_input.su ./Src/Service/svc_storage.cyclo ./Src/Service/svc_storage.d ./Src/Service/svc_storage.o ./Src/Service/svc_storage.su
 
 .PHONY: clean-Src-2f-Service
 

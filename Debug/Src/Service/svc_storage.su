@@ -1,0 +1,2 @@
+../Src/Service/svc_storage.c:8:6:Svc_Storage_Load	8	static
+../Src/Service/svc_storage.c:44:6:Svc_Storage_Save	80	static

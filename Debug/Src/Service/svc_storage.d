@@ -1,6 +1,6 @@
-Src/App/app_ui.o: ../Src/App/app_ui.c ../Src/App/app_ui.h \
- /home/min/FC_mamab_4_H743_V2/MinTX/Src/Driver/drv_st7789.h \
- ../Core/Inc/main.h ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal.h \
+Src/Service/svc_storage.o: ../Src/Service/svc_storage.c \
+ ../Src/Service/svc_storage.h ../Core/Inc/main.h \
+ ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal.h \
  ../Core/Inc/stm32f4xx_hal_conf.h \
  ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_rcc.h \
  ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_def.h \
@@ -32,11 +32,17 @@ Src/App/app_ui.o: ../Src/App/app_ui.c ../Src/App/app_ui.h \
  ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_tim.h \
  ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_tim_ex.h \
  ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_uart.h \
- /home/min/FC_mamab_4_H743_V2/MinTX/Src/Service/svc_input.h \
- /home/min/FC_mamab_4_H743_V2/MinTX/Src/Driver/drv_encoder.h \
- /home/min/FC_mamab_4_H743_V2/MinTX/Src/Service/svc_storage.h
-../Src/App/app_ui.h:
-/home/min/FC_mamab_4_H743_V2/MinTX/Src/Driver/drv_st7789.h:
+ ../Src/Service/svc_input.h \
+ ../Middlewares/Third_Party/FreeRTOS/Source/include/FreeRTOS.h \
+ ../Core/Inc/FreeRTOSConfig.h \
+ ../Middlewares/Third_Party/FreeRTOS/Source/include/projdefs.h \
+ ../Middlewares/Third_Party/FreeRTOS/Source/include/portable.h \
+ ../Middlewares/Third_Party/FreeRTOS/Source/include/deprecated_definitions.h \
+ ../Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM4F/portmacro.h \
+ ../Middlewares/Third_Party/FreeRTOS/Source/include/mpu_wrappers.h \
+ ../Middlewares/Third_Party/FreeRTOS/Source/include/task.h \
+ ../Middlewares/Third_Party/FreeRTOS/Source/include/list.h
+../Src/Service/svc_storage.h:
 ../Core/Inc/main.h:
 ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal.h:
 ../Core/Inc/stm32f4xx_hal_conf.h:
@@ -70,6 +76,13 @@ Src/App/app_ui.o: ../Src/App/app_ui.c ../Src/App/app_ui.h \
 ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_tim.h:
 ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_tim_ex.h:
 ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_uart.h:
-/home/min/FC_mamab_4_H743_V2/MinTX/Src/Service/svc_input.h:
-/home/min/FC_mamab_4_H743_V2/MinTX/Src/Driver/drv_encoder.h:
-/home/min/FC_mamab_4_H743_V2/MinTX/Src/Service/svc_storage.h:
+../Src/Service/svc_input.h:
+../Middlewares/Third_Party/FreeRTOS/Source/include/FreeRTOS.h:
+../Core/Inc/FreeRTOSConfig.h:
+../Middlewares/Third_Party/FreeRTOS/Source/include/projdefs.h:
+../Middlewares/Third_Party/FreeRTOS/Source/include/portable.h:
+../Middlewares/Third_Party/FreeRTOS/Source/include/deprecated_definitions.h:
+../Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM4F/portmacro.h:
+../Middlewares/Third_Party/FreeRTOS/Source/include/mpu_wrappers.h:
+../Middlewares/Third_Party/FreeRTOS/Source/include/task.h:
+../Middlewares/Third_Party/FreeRTOS/Source/include/list.h:

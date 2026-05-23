@@ -4,6 +4,7 @@
 #include "cmsis_os.h"
 #include "app_ui.h"
 #include "drv_encoder.h"
+#include "svc_storage.h"
 
 
 void App_DisplayTask(void *argument){
@@ -19,6 +20,7 @@ void App_DisplayTask(void *argument){
 void App_InputTask(void *argument) {
 	Svc_Input_Init();
 	Drv_Encoder_Init();
+	Svc_Storage_Load();
 	for(;;){
 		Svc_Input_Update();
 		Drv_Encoder_Update();
